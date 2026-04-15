@@ -1,93 +1,66 @@
 import re
 
 TOKENS = [
-    ("COMENT", r"#.*"),
+    ("COMENTARIO", r"#.*"),
+    ("NUM_FLOAT", r"\d+\.\d+"),
+    ("NUM_INT", r"\d+"),
+    ("STRING", r'"[^"]*"'),
 
-    # palavras chave
-    ("DECL", r"\banel\b"),
-    ("TIPO", r"\bouro\b|\bprata\b|\btexto\b|\bdestino\b"),
-    ("IF", r"\bse\b"),
-    ("ELSE", r"\bsenao\b"),
-    ("WHILE", r"\benquanto\b"),
-    ("PRINT", r"\bpalantir\b"),
-
-    # valores
-    ("BOOL", r"\bverdadeiro\b|\bfalso\b"),
-    ("FLOAT", r"\d+\.\d+"),
-    ("INT", r"\d+"),
-    ("STR", r'"[^"]*"'),
-
-    # operadores
     ("OPNUM", r"\+|\-|\*|\/|\^"),
+    ("LOGICO", r"\be\b|\bou\b|\bnao\b"),
     ("OPREL", r"==|!=|>=|<=|>|<"),
-    ("OPLOG", r"\be\b|\bou\b|\bnao\b"),
 
-    # simbolos
-    ("ATRIB", r"="),
-    ("LP", r"\("),
-    ("RP", r"\)"),
-    ("DP", r":"),
-    
-    ("ID", r"[a-zA-Z][a-zA-Z0-9_]*"),
-    ("SPACE", r"\s+"),
+    ("ATRIBUICAO", r"="),
+    ("PARENTESES", r"\(|\)"),
+    ("DOIS_PONTOS", r":"),
+
+    # palavras chave da terra media
+    ("KEYWORD", r"\banel\b|\bouro\b|\bprata\b|\btexto\b|\bdestino\b|\bse\b|\bsenao\b|\benquanto\b|\bpalantir\b|\bverdadeiro\b|\bfalso\b"),
+
+    ("IDENTIFICADOR", r"[a-zA-Z_][a-zA-Z0-9_]*"),
+    ("ESPACO", r"\s+"),
 ]
 
+def lexer(codigo):
+    tokens = []
+    pos = 0
 
-def lexico(cod):
-    tks = []
-    i = 0
+    while pos < len(codigo):
+        match = None
 
-    while i < len(cod):
-        ok = False
+        for tipo, regex in TOKENS:
+            pattern = re.compile(regex)
+            match = pattern.match(codigo, pos)
 
-        for tp, rg in TOKENS:
-            m = re.match(rg, cod[i:])
-            if m:
-                v = m.group(0)
+            if match:
+                valor = match.group(0)
 
-                if tp not in ["SPACE", "COMENT"]:
-                    tks.append((tp, v))
+                if tipo != "ESPACO" and tipo != "COMENTARIO":
+                    tokens.append((tipo, valor))
 
-                i += len(v)
-                ok = True
+                pos = match.end(0)
                 break
 
-        if not ok:
-            raise Exception("erro lexico -> " + cod[i])
+        if not match:
+            raise Exception(f"erro lexico em: {codigo[pos]}")
 
-    return tks
+    return tokens
 
 
-def norm(tp, v):
-    if tp == "DECL":
-        return "decl"
-    if tp == "TIPO":
-        return "tipo"
-    if tp == "ID":
+def normalizar_token(tipo, valor):
+    if tipo == "IDENTIFICADOR":
         return "id"
-    if tp in ["INT", "FLOAT"]:
+    elif tipo in ["NUM_INT", "NUM_FLOAT"]:
         return "num"
-    if tp == "STR":
-        return "string"
-    if tp == "BOOL":
-        return "bool"
-    if tp == "OPNUM":
-        return "opnum"
-    if tp == "OPREL":
-        return "oprel"
-    if tp == "OPLOG":
-        return "oplog"
-    if tp == "IF":
-        return "if"
-    if tp == "ELSE":
-        return "else"
-    if tp == "WHILE":
-        return "while"
-    if tp == "PRINT":
-        return "print"
-
-    return v
-
-
-def toTerm(tks):
-    return [norm(t, v) for t, v in tks]
+    elif tipo == "STRING":
+        return "texto"
+    elif tipo == "KEYWORD":
+        return valor.lower()
+    elif tipo == "LOGICO":
+        return valor
+    elif tipo == "OPNUM":
+        return valor
+    elif tipo == "OPREL":
+        return valor
+    else:
+        return valor

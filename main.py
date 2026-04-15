@@ -1,40 +1,36 @@
-from lexico import lexico, toTerm
-from sintatico import first
-from gramatica import gramatica
+from lexico import lexer, normalizar_token
+from first import compute_first
+from gramatica import GRAMATICA
 
-codigo = """
-# declaracao
+codigo = '''
 anel ouro frodo = 10
 anel prata gandalf = 2.5
 anel texto anelUnico = "Um Anel"
 anel destino jornada = verdadeiro
 
-# conta
 frodo = frodo + 5 * gandalf ^ 2
 
-# if
 se (frodo > 10 e jornada):
     palantir("forte")
 senao:
     palantir("fraco")
 
-# loop
 enquanto (frodo < 20):
     frodo = frodo + 1
-"""
+'''
 
-tks = lexico(codigo)
-terms = toTerm(tks)
+# lexico
+tokens = lexer(codigo)
+print("TOKENS:")
+print(tokens)
 
-print("tokens:")
-for t in tks:
-    print(t)
+# normaliza
+normalizados = [normalizar_token(t, v) for t, v in tokens]
+print("\nTOKENS NORMALIZADOS:")
+print(normalizados)
 
-print("\nterminais:")
-print(terms)
-
-f = first(gramatica)
-
+# FIRST
+first = compute_first(GRAMATICA)
 print("\nFIRST:")
-for k in f:
-    print(k, "=", f[k])
+for k, v in first.items():
+    print(k, ":", v)

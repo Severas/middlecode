@@ -1,30 +1,45 @@
-# meio basicona sem inventar muita coisa, pra nao complicar dps kkk
-gramatica = {
+# meio basicona sem inventar muita coisa, pra nao complicar dps kkk agora com ordem de precedencia
 
-    "S": [["CMD_LIST"]],
+GRAMATICA = {
 
-    "CMD_LIST": [["CMD", "CMD_LIST"], ["ε"]],
+    "PROG": [["CMD", "PROG"], ["ε"]],
 
-    "CMD": [
-        ["decl", "tipo", "id", "=", "E"],
-        ["id", "=", "E"],
+    "CMD": [["DECL"], ["ATR"], ["IF"], ["WHILE"], ["PRINT"]],
 
-        ["print", "(", "E", ")"],
+    "DECL": [["anel", "TIPO", "id", "=", "EXPR"]],
 
-        ["if", "(", "E", ")", ":", "CMD"],
-        ["if", "(", "E", ")", ":", "CMD", "else", ":", "CMD"],
+    "TIPO": [["ouro"], ["prata"], ["texto"], ["destino"]],
 
-        ["while", "(", "E", ")", ":", "CMD"]
+    "ATR": [["id", "=", "EXPR"]],
+
+    "IF": [["se", "(", "EXPR_LOG", ")", ":", "CMD", "senao", ":", "CMD"]],
+
+    "WHILE": [["enquanto", "(", "EXPR_LOG", ")", ":", "CMD"]],
+
+    "PRINT": [["palantir", "(", "EXPR", ")"]],
+
+    "EXPR": [["EXPR_LOG"]],
+
+    # logico
+    "EXPR_LOG": [["EXPR_LOG", "ou", "EXPR_AND"], ["EXPR_AND"]],
+    "EXPR_AND": [["EXPR_AND", "e", "EXPR_NOT"], ["EXPR_NOT"]],
+    "EXPR_NOT": [["nao", "EXPR_NOT"], ["EXPR_REL"]],
+
+    "EXPR_REL": [
+        ["EXPR_NUM", "OPREL", "EXPR_NUM"],
+        ["EXPR_NUM"],
+        ["verdadeiro"],
+        ["falso"]
     ],
 
-    "E": [["T", "E'"]],
+    # numerico com precedencia
+    "EXPR_NUM": [["EXPR_NUM", "+", "TERM"], ["EXPR_NUM", "-", "TERM"], ["TERM"]],
+    "TERM": [["TERM", "*", "FATOR"], ["TERM", "/", "FATOR"], ["FATOR"]],
+    "FATOR": [["BASE", "^", "FATOR"], ["BASE"]],
 
-    "E'": [["opnum", "T", "E'"], ["ε"]],
-
-    "T": [
-        ["id"],
+    "BASE": [
+        ["(", "EXPR_NUM", ")"],
         ["num"],
-        ["string"],
-        ["bool"]
+        ["id"]
     ]
 }
