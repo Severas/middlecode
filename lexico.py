@@ -53,7 +53,7 @@ def normalizar_token(tipo, valor):
     elif tipo in ["NUM_INT", "NUM_FLOAT"]:
         return "num"
     elif tipo == "STRING":
-        return "texto"
+        return "string"
     elif tipo == "KEYWORD":
         return valor.lower()
     elif tipo == "LOGICO":
@@ -61,6 +61,6 @@ def normalizar_token(tipo, valor):
     elif tipo == "OPNUM":
         return valor
     elif tipo == "OPREL":
-        return valor
+        return "OPREL"
     else:
         return valor
