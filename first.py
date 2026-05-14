@@ -9,6 +9,7 @@ def compute_first(gramatica):
         for X in gramatica:
             for prod in gramatica[X]:
 
+                # epsilon
                 if prod == ["ε"]:
                     if "ε" not in first[X]:
                         first[X].add("ε")
@@ -26,14 +27,17 @@ def compute_first(gramatica):
 
                     # nao terminal
                     antes = len(first[X])
+
                     first[X] |= (first[simbolo] - {"ε"})
 
                     if len(first[X]) > antes:
                         mudou = True
 
+                    # para se nao tiver epsilon
                     if "ε" not in first[simbolo]:
                         break
 
+                    # todos possuem epsilon
                     if i == len(prod) - 1:
                         if "ε" not in first[X]:
                             first[X].add("ε")
